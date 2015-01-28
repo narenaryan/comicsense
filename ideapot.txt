@@ -1,0 +1,116 @@
+
+"""
+# Syllable Finding Technique
+
+from curses.ascii import isdigit 
+from nltk.corpus import cmudict 
+
+d = cmudict.dict() # get the CMU Pronouncing Dict
+
+def nsyl(word): 
+    """return the max syllable count in the case of multiple pronunciations"""
+    return max([len([y for y in x if isdigit(y[-1])]) for x in d[word.lower()]])
+
+
+#Propernoun finding Technique
+
+from nltk.tag import pos_tag
+
+sentence = "Michael Jackson likes to eat at McDonalds"
+tagged_sent = pos_tag(sentence.split())
+propernouns = [word for word,pos in tagged_sent if pos == 'NNP']
+
+"""
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+The Coleman-Liau Index 
+
+Formula: CLI = 0.0588 x 448(L) - 0.296 x 4.0(S) - 15.8 
+
+
+L = sum([len[i] for i in word_tokenize(j)[:100]])
+
+temp = [len(word_tokenize(i)) for i in sent_tokenize(j)]
+
+for i in range(len(temp)):
+	if sum(temp[:i]) >= 100:
+		S = i
+		break
+
+CLI = 0.0588 x L - 0.296 x S - 15.8 
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+The Flesch-Kincaid Grade Level Readability Formula 
+
+FKRA = (0.39 x ASL) + (11.8 x ASW) - 15.59 
+
+FKRA = Flesch-Kincaid Reading Age
+
+ASL = Average Sentence Length (i.e., the number of words divided by the number of sentences)
+
+ASW = Average number of Syllable per Word (i.e., the number of syllables divided by the number of words) 
+
+ASL = len(word_tokenize(j))/len(sent_tokenize(j))
+ASW = len([nsyl(i) for i in word_tokenize(j)])/len(word_tokenize(j))
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+The Flesch Reading Ease Readability Formula 
+
+RE = 206.835 – (1.015 x ASL) – (84.6 x ASW)
+
+
+ASL = Average Sentence Length (i.e., the number of words divided by the number of sentences)
+
+ASW = Average number of syllables per word (i.e., the number of syllables divided by the number of words) 
+
+ASL = len(word_tokenize(j))/len(sent_tokenize(j))
+
+ASW = len([nsyl(i) for i in word_tokenize(j)])/len(word_tokenize(j))
+
+
+90-100 : Very Easy
+80-89 : Easy
+70-79 : Fairly Easy
+60-69 : Standard
+50-59 : Fairly Difficult
+30-49 : Difficult
+0-29 : Very Confusing 
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+The Gunning’s Fog Index (or FOG) Readability Formula
+
+Grade Level = 0.4 (ASL + PHW)
+
+ASL = Average Sentence Length (i.e., number of words divided by the number of sentences)
+
+PHW = Percentage of Hard Words 
+
+ASL = len(word_tokenize(j))/len(sent_tokenize(j))
+
+
+sentences = sent_tokenize(j)
+pronouns =[]
+
+for i in sentences:
+	tagged_sent = pos_tag(i.split())
+	for word in [word for word,pos in tagged_sent if pos == 'NNP']:
+		pronouns.append(word)
+
+from nltk.stem.porter import PorterStemmer
+
+stemmer = PorterStemmer()
+
+stemmed = [i for i in word_tokenize(j) if nsyl(i)==2 and i.endswith('es') or i.endswith('ed')]
+
+count = 0
+for i in word_tokenize(j):
+	if nsyl(i) >= 3:
+		if i not in propernouns and i not in stemmed:
+			count = count+1
